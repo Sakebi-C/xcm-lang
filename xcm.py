@@ -12,6 +12,8 @@ import math
 import json
 import random
 import time
+
+XCM_VERSION = "1.0.0"
 def _ask_secret_impl(prompt):
     print(prompt, end="", flush=True)
     result = ""
