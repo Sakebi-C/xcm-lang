@@ -1390,7 +1390,7 @@ def main():
         print(f"""
 ╔══════════════════════════════════════════╗
 ║         XCM Language Engine             ║
-║         Version {XCM_VERSION}                    ║
+║         Version 1.0.0                    ║
 ╠══════════════════════════════════════════╣
 ║  xcm run <file.xcm>   Run a XCM file    ║
 ║  xcm version          Show version      ║
