@@ -111,4 +111,4 @@ else
     echo -e "  Try manually:"
     echo -e "  ${BOLD}cp /tmp/xcm_install.py $INSTALL_DIR/xcm && chmod +x $INSTALL_DIR/xcm${RESET}"
     exit 1
-file
+fi
