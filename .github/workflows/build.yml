@@ -1,0 +1,144 @@
+name: Build XCM Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'        # Trigger saat push tag seperti v1.0.0
+  workflow_dispatch: # Bisa trigger manual dari GitHub
+
+jobs:
+
+  # ============================================================
+  #  Build untuk Windows (.exe)
+  # ============================================================
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build xcm.exe
+        run: pyinstaller --onefile --name xcm xcm.py
+
+      - name: Upload xcm.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcm-windows
+          path: dist/xcm.exe
+
+  # ============================================================
+  #  Build untuk Linux
+  # ============================================================
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build xcm-linux
+        run: pyinstaller --onefile --name xcm-linux xcm.py
+
+      - name: Upload xcm-linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcm-linux
+          path: dist/xcm-linux
+
+  # ============================================================
+  #  Build untuk macOS
+  # ============================================================
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build xcm-macos
+        run: pyinstaller --onefile --name xcm-macos xcm.py
+
+      - name: Upload xcm-macos
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcm-macos
+          path: dist/xcm-macos
+
+  # ============================================================
+  #  Buat GitHub Release + Upload semua binary
+  # ============================================================
+  release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download xcm.exe
+        uses: actions/download-artifact@v4
+        with:
+          name: xcm-windows
+          path: dist/
+
+      - name: Download xcm-linux
+        uses: actions/download-artifact@v4
+        with:
+          name: xcm-linux
+          path: dist/
+
+      - name: Download xcm-macos
+        uses: actions/download-artifact@v4
+        with:
+          name: xcm-macos
+          path: dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: XCM ${{ github.ref_name }}
+          body: |
+            ## XCM ${{ github.ref_name }}
+
+            ### Installation
+
+            **Windows:**
+            Download `xcm.exe` below and move to any folder in your PATH.
+
+            **Linux / macOS:**
+            ```bash
+            bash <(curl -fsSL https://raw.githubusercontent.com/Sakebi-C/xcm-lang/main/install.sh)
+            ```
+
+            **Termux:**
+            ```bash
+            bash <(curl -fsSL https://raw.githubusercontent.com/Sakebi-C/xcm-lang/main/install.sh)
+            ```
+          files: |
+            dist/xcm.exe
+            dist/xcm-linux
+            dist/xcm-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
