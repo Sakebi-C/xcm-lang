@@ -16,7 +16,8 @@ say(f"Hello, {name}!")
 
 ### Termux / Linux / macOS
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Sakebi-C/xcm-lang/main/xcm.py -o $PREFIX/tmp/xcm_install.py && cp $PREFIX/tmp/xcm_install.py $PREFIX/bin/xcm && chmod +x $PREFIX/bin/xcm_install 
+bash <(curl -fsSL https://raw.githubusercontent.com/Sakebi-C/xcm-lang/main/install.sh)
+
 ```
 
 ### Windows
