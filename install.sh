@@ -28,14 +28,17 @@ if [ -d "/data/data/com.termux" ]; then
     PLATFORM="termux"
     INSTALL_DIR="$PREFIX/bin"
     PYTHON_CMD="python3"
+    TMP_FILE="$PREFIX/tmp/xcm_install.py"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     PLATFORM="macos"
     INSTALL_DIR="/usr/local/bin"
     PYTHON_CMD="python3"
+    TMP_FILE="/tmp/xcm_install.py"
 else
     PLATFORM="linux"
     INSTALL_DIR="/usr/local/bin"
     PYTHON_CMD="python3"
+    TMP_FILE="/tmp/xcm_install.py"
 fi
 
 echo -e "  Platform : ${BLUE}$PLATFORM${RESET}"
@@ -63,9 +66,9 @@ echo ""
 # Check curl or wget
 echo -e "  ${YELLOW}Downloading XCM...${RESET}"
 if command -v curl &> /dev/null; then
-    curl -fsSL "$RAW_URL" -o /tmp/xcm_install.py
+    curl -fsSL "$RAW_URL" -o "$TMP_FILE"
 elif command -v wget &> /dev/null; then
-    wget -q "$RAW_URL" -O /tmp/xcm_install.py
+    wget -q "$RAW_URL" -O "$TMP_FILE"
 else
     echo -e "  ${RED}curl or wget not found!${RESET}"
     if [ "$PLATFORM" == "termux" ]; then
@@ -75,7 +78,7 @@ else
 fi
 
 # Check download success
-if [ ! -f /tmp/xcm_install.py ]; then
+if [ ! -f "$TMP_FILE" ]; then
     echo -e "  ${RED}Download failed! Check your internet connection.${RESET}"
     exit 1
 fi
@@ -86,15 +89,15 @@ echo ""
 # Install
 echo -e "  ${YELLOW}Installing...${RESET}"
 if [ "$PLATFORM" == "termux" ]; then
-    cp /tmp/xcm_install.py "$INSTALL_DIR/xcm"
+    cp "$TMP_FILE" "$INSTALL_DIR/xcm"
     chmod +x "$INSTALL_DIR/xcm"
 else
-    sudo cp /tmp/xcm_install.py "$INSTALL_DIR/xcm"
+    sudo cp "$TMP_FILE" "$INSTALL_DIR/xcm"
     sudo chmod +x "$INSTALL_DIR/xcm"
 fi
 
 # Cleanup
-rm -f /tmp/xcm_install.py
+rm -f "$TMP_FILE"
 
 # Verify
 if command -v xcm &> /dev/null; then
