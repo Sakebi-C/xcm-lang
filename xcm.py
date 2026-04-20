@@ -13,7 +13,7 @@ import json
 import random
 import time
 
-XCM_VERSION = "1.0.0"
+XCM_VERSION = "1.1.0"
 def _ask_secret_impl(prompt):
     print(prompt, end="", flush=True)
     result = ""
@@ -1392,7 +1392,7 @@ def main():
         print(f"""
 ╔══════════════════════════════════════════╗
 ║         XCM Language Engine             ║
-║         Version 1.0.0                    ║
+║         Version 1.1.0                    ║
 ╠══════════════════════════════════════════╣
 ║  xcm run <file.xcm>   Run a XCM file    ║
 ║  xcm version          Show version      ║
@@ -1409,6 +1409,32 @@ def main():
         except SystemExit: pass
     elif args[0] in ('version', '-v'):
         print(f'XCM Engine v{XCM_VERSION}')
+    elif args[0] == 'update':
+        import urllib.request
+        RAW_URL = "https://raw.githubusercontent.com/Sakebi-C/xcm-lang/main/xcm.py"
+        print(f'XCM Engine v{XCM_VERSION}')
+        print('Checking for updates...')
+        try:
+            req = urllib.request.urlopen(RAW_URL, timeout=10)
+            new_code = req.read().decode('utf-8')
+
+            # Get new version
+            import re as _re
+            m = _re.search(r'XCM_VERSION\s*=\s*["\'](.*?)["\']\s*', new_code)
+            new_version = m.group(1) if m else 'unknown'
+
+            if new_version == XCM_VERSION:
+                print(f'Already up to date! (v{XCM_VERSION})')
+            else:
+                # Replace current file
+                current_path = os.path.abspath(__file__)
+                with open(current_path, 'w') as f:
+                    f.write(new_code)
+                print(f'Updated: v{XCM_VERSION} -> v{new_version}')
+                print('Restart your terminal to apply changes.')
+        except Exception as e:
+            print(f'Update failed: {e}')
+            print('Check your internet connection.')
     else:
         print(f'XCM Error: Unknown command "{args[0]}"')
         print('Usage: xcm run <file.xcm>')
